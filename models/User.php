@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\enums\UserStatusEnum;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -18,10 +19,6 @@ use yii\db\ActiveRecord;
  */
 class User extends ActiveRecord
 {
-    const STATUS_DELETED = 0;
-    const STATUS_HIDDEN = 1;
-    const STATUS_ACTIVE = 10;
-
     /**
      * @inheritdoc
      */
@@ -49,8 +46,8 @@ class User extends ActiveRecord
 
             [['username'], 'unique'],
 
-            ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED, self::STATUS_HIDDEN]],
+            ['status', 'default', 'value' => UserStatusEnum::STATUS_ACTIVE],
+            ['status', 'in', 'range' => [UserStatusEnum::STATUS_ACTIVE, UserStatusEnum::STATUS_DELETED, UserStatusEnum::STATUS_HIDDEN]],
         ];
     }
 
@@ -66,23 +63,8 @@ class User extends ActiveRecord
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function getStatusTexts()
+    public function getStatusText(): string
     {
-        return [
-            self::STATUS_ACTIVE => Yii::t('app', 'Active'),
-            self::STATUS_DELETED => Yii::t('app', 'Deleted'),
-            self::STATUS_HIDDEN => Yii::t('app', 'Hidden'),
-        ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getStatusText()
-    {
-        return self::getStatusTexts()[$this->status] ?? $this->status;
+        return UserStatusEnum::getStatusTexts()[$this->status] ?? $this->status;
     }
 }

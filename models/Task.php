@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\enums\TaskStateEnum;
+use app\enums\TaskStatusEnum;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -35,14 +37,6 @@ use yii\db\ActiveRecord;
  */
 class Task extends ActiveRecord
 {
-    const STATUS_NEW = 0;
-    const STATUS_DONE = 1;
-    const STATUS_CANCEL = 3;
-
-    const STATE_INBOX = 'inbox';
-    const STATE_DONE = 'done';
-    const STATE_FUTURE = 'future';
-
     /**
      * @inheritdoc
      */
@@ -102,24 +96,12 @@ class Task extends ActiveRecord
     }
 
     /**
-     * @return array
-     */
-    public static function getStatusTexts()
-    {
-        return [
-            self::STATUS_NEW => Yii::t('app', 'New'),
-            self::STATUS_DONE => Yii::t('app', 'Complete'),
-            self::STATUS_CANCEL => Yii::t('app', 'Cancel'),
-        ];
-    }
-
-    /**
      * @param $value
      * @return int|mixed
      */
     public function getStatusTextByValue($value)
     {
-        return self::getStatusTexts()[$value] ?? $value;
+        return TaskStatusEnum::getStatusTexts()[$value] ?? $value;
     }
 
     /**
@@ -127,19 +109,7 @@ class Task extends ActiveRecord
      */
     public function getStatusText()
     {
-        return self::getStatusTextByValue($this->status);
-    }
-
-    /**
-     * @return array
-     */
-    public static function getStateTexts()
-    {
-        return [
-            self::STATE_INBOX => Yii::t('app', 'Inbox'),
-            self::STATE_DONE => Yii::t('app', 'Done'),
-            self::STATE_FUTURE => Yii::t('app', 'Future')
-        ];
+        return $this->getStatusTextByValue($this->status);
     }
 
     /**
@@ -147,23 +117,16 @@ class Task extends ActiveRecord
      */
     public function getStateText()
     {
-        return self::getStateTexts()[$this->state] ?? $this->state;
+        return TaskStateEnum::getStateTexts()[$this->state] ?? $this->state;
     }
 
-
-    /**
-     * @return bool
-     */
-    public function getIsOverdue()
+    public function getIsOverdue(): bool
     {
-        return $this->status !== self::STATUS_DONE && strtotime($this->due_date) < time();
+        return $this->status !== TaskStatusEnum::STATUS_DONE && strtotime($this->due_date) < time();
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsDone()
+    public function getIsDone(): bool
     {
-        return $this->status == self::STATUS_DONE;
+        return $this->status === TaskStatusEnum::STATUS_DONE;
     }
 }
