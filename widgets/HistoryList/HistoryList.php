@@ -2,35 +2,33 @@
 
 namespace app\widgets\HistoryList;
 
-use app\models\search\HistorySearch;
 use app\widgets\Export\Export;
 use yii\base\Widget;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use Yii;
 
 class HistoryList extends Widget
 {
+    /** @var ActiveDataProvider */
+    public $dataProvider;
+
     /**
      * @return string
      */
     public function run()
     {
-        $model = new HistorySearch();
+        $params = Yii::$app->request->queryParams;
 
         return $this->render('main', [
-            'model' => $model,
-            'linkExport' => $this->getLinkExport(),
-            'dataProvider' => $model->search(Yii::$app->request->queryParams)
+            'linkExport'   => $this->getLinkExport($params),
+            'dataProvider' => $this->dataProvider,
         ]);
     }
 
-    /**
-     * @return string
-     */
-    private function getLinkExport()
+    private function getLinkExport(array $params): string
     {
-        $params = Yii::$app->getRequest()->getQueryParams();
         $params = ArrayHelper::merge([
             'exportType' => Export::FORMAT_CSV
         ], $params);

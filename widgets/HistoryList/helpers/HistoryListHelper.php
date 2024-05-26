@@ -9,35 +9,75 @@ use app\models\History;
 
 class HistoryListHelper
 {
-    public static function getBodyByModel(History $model)
+    public static function getBodyByModel(History $model): string
     {
         switch ($model->event) {
             case HistoryEventEnum::EVENT_CREATED_TASK:
             case HistoryEventEnum::EVENT_COMPLETED_TASK:
             case HistoryEventEnum::EVENT_UPDATED_TASK:
-                $task = $model->task;
-                return "$model->eventText: " . ($task->title ?? '');
+                return self::formatTask($model);
+
             case HistoryEventEnum::EVENT_INCOMING_SMS:
             case HistoryEventEnum::EVENT_OUTGOING_SMS:
-                return $model->sms->message ? $model->sms->message : '';
+                return self::formatSms($model);
+
             case HistoryEventEnum::EVENT_OUTGOING_FAX:
             case HistoryEventEnum::EVENT_INCOMING_FAX:
-                return $model->eventText;
+                return self::formatFax($model);
+
             case HistoryEventEnum::EVENT_CUSTOMER_CHANGE_TYPE:
-                return "$model->eventText " .
-                    (Customer::getTypeTextByType($model->getDetailOldValue('type')) ?? "not set") . ' to ' .
-                    (Customer::getTypeTextByType($model->getDetailNewValue('type')) ?? "not set");
+                return self::formatCustomerType($model);
+
             case HistoryEventEnum::EVENT_CUSTOMER_CHANGE_QUALITY:
-                return "$model->eventText " .
-                    (Customer::getQualityTextByQuality($model->getDetailOldValue('quality')) ?? "not set") . ' to ' .
-                    (Customer::getQualityTextByQuality($model->getDetailNewValue('quality')) ?? "not set");
+                return self::formatCustomerQuality($model);
+
             case HistoryEventEnum::EVENT_INCOMING_CALL:
             case HistoryEventEnum::EVENT_OUTGOING_CALL:
-                /** @var Call $call */
-                $call = $model->call;
-                return ($call ? $call->totalStatusText . ($call->getTotalDisposition(false) ? " <span class='text-grey'>" . $call->getTotalDisposition(false) . "</span>" : "") : '<i>Deleted</i> ');
+                return self::formatCall($model);
+
             default:
-                return $model->eventText;
+                return self::formatDefault($model);
         }
+    }
+
+    protected static function formatTask(History $model): string
+    {
+        return "$model->eventText: " . ($model->task->title ?? '');
+    }
+
+    protected static function formatSms(History $model): string
+    {
+        return $model->sms->message ?: '';
+    }
+
+    protected static function formatFax(History $model): string
+    {
+        return $model->eventText;
+    }
+
+    protected static function formatCustomerType(History $model): string
+    {
+        return "$model->eventText " .
+            (Customer::getTypeTextByType($model->getDetailOldValue('type')) ?? "not set") . ' to ' .
+            (Customer::getTypeTextByType($model->getDetailNewValue('type')) ?? "not set");
+    }
+
+    protected static function formatCustomerQuality(History $model): string
+    {
+        return "$model->eventText " .
+            (Customer::getQualityTextByQuality($model->getDetailOldValue('quality')) ?? "not set") . ' to ' .
+            (Customer::getQualityTextByQuality($model->getDetailNewValue('quality')) ?? "not set");
+    }
+
+    protected static function formatCall(History $model): string
+    {
+        /** @var Call $call */
+        $call = $model->call;
+        return ($call ? $call->totalStatusText . ($call->getTotalDisposition(false) ? " <span class='text-grey'>" . $call->getTotalDisposition(false) . "</span>" : "") : '<i>Deleted</i> ');
+    }
+
+    protected static function formatDefault(History $model): string
+    {
+        return $model->eventText;
     }
 }
