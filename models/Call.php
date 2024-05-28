@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\enums\CallDirectionEnum;
 use app\enums\CallStatusEnum;
+use app\translations\CallDirectionTranslation;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -66,16 +67,16 @@ class Call extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'ins_ts' => Yii::t('app', 'Date'),
-            'direction' => Yii::t('app', 'Direction'),
+            'id'            => Yii::t('app', 'ID'),
+            'ins_ts'        => Yii::t('app', 'Date'),
+            'direction'     => Yii::t('app', 'Direction'),
             'directionText' => Yii::t('app', 'Direction'),
-            'user_id' => Yii::t('app', 'User ID'),
-            'customer_id' => Yii::t('app', 'Customer ID'),
-            'status' => Yii::t('app', 'Status'),
-            'statusText' => Yii::t('app', 'Status'),
-            'phone_from' => Yii::t('app', 'Caller Phone'),
-            'phone_to' => Yii::t('app', 'Dialed Phone'),
+            'user_id'       => Yii::t('app', 'User ID'),
+            'customer_id'   => Yii::t('app', 'Customer ID'),
+            'status'        => Yii::t('app', 'Status'),
+            'statusText'    => Yii::t('app', 'Status'),
+            'phone_from'    => Yii::t('app', 'Caller Phone'),
+            'phone_to'      => Yii::t('app', 'Dialed Phone'),
             'user.fullname' => Yii::t('app', 'User'),
             'customer.name' => Yii::t('app', 'Client'),
         ];
@@ -143,12 +144,9 @@ class Call extends ActiveRecord
         return implode(': ', $t);
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getFullDirectionText()
+    public function getFullDirectionText(): string
     {
-        return CallDirectionEnum::getFullDirectionTexts()[$this->direction] ?? $this->direction;
+        return CallDirectionTranslation::getText($this->direction) ?? (string) $this->direction;
     }
 
     public function getDurationText(): string

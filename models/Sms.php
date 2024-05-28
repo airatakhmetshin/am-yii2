@@ -2,8 +2,8 @@
 
 namespace app\models;
 
-use app\enums\SmsDirectionEnum;
-use app\enums\SmsStatusEnum;
+use app\translations\SmsDirectionTranslation;
+use app\translations\SmsStatusTranslation;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -61,16 +61,16 @@ class Sms extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User ID'),
-            'customer_id' => Yii::t('app', 'Customer ID'),
-            'status' => Yii::t('app', 'Status'),
-            'statusText' => Yii::t('app', 'Status'),
-            'phone_from' => Yii::t('app', 'Phone From'),
-            'phone_to' => Yii::t('app', 'Phone To'),
-            'message' => Yii::t('app', 'Message'),
-            'ins_ts' => Yii::t('app', 'Date'),
-            'direction' => Yii::t('app', 'Direction'),
+            'id'            => Yii::t('app', 'ID'),
+            'user_id'       => Yii::t('app', 'User ID'),
+            'customer_id'   => Yii::t('app', 'Customer ID'),
+            'status'        => Yii::t('app', 'Status'),
+            'statusText'    => Yii::t('app', 'Status'),
+            'phone_from'    => Yii::t('app', 'Phone From'),
+            'phone_to'      => Yii::t('app', 'Phone To'),
+            'message'       => Yii::t('app', 'Message'),
+            'ins_ts'        => Yii::t('app', 'Date'),
+            'direction'     => Yii::t('app', 'Direction'),
             'directionText' => Yii::t('app', 'Direction'),
             'user.fullname' => Yii::t('app', 'User'),
             'customer.name' => Yii::t('app', 'Client'),
@@ -93,36 +93,22 @@ class Sms extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public static function getStatusTextByValue($value)
+    public static function getStatusTextByValue(string $value): string
     {
-        return SmsStatusEnum::getStatusTexts()[$value] ?? $value;
+        return SmsStatusTranslation::getText($value) ?? $value;
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getStatusText()
+    public function getStatusText(): string
     {
         return self::getStatusTextByValue($this->status);
     }
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public static function getDirectionTextByValue($value)
+    public static function getDirectionTextByValue(string $value): string
     {
-        return SmsDirectionEnum::getDirectionTexts()[$value] ?? $value;
+        return SmsDirectionTranslation::getText($value) ?? $value;
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getDirectionText()
+    public function getDirectionText(): string
     {
         return self::getDirectionTextByValue($this->direction);
     }

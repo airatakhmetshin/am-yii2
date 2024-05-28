@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use app\enums\FaxTypeEnum;
+use app\translations\FaxTypeTranslation;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -52,11 +52,11 @@ class Fax extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'ins_ts' => Yii::t('app', 'Created Time'),
+            'id'      => Yii::t('app', 'ID'),
+            'ins_ts'  => Yii::t('app', 'Created Time'),
             'user_id' => Yii::t('app', 'User ID'),
-            'from' => Yii::t('app', 'From'),
-            'to' => Yii::t('app', 'To')
+            'from'    => Yii::t('app', 'From'),
+            'to'      => Yii::t('app', 'To'),
         ];
     }
 
@@ -68,11 +68,8 @@ class Fax extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getTypeText()
+    public function getTypeText(): string
     {
-        return FaxTypeEnum::getTypeTexts()[$this->type] ?? $this->type;
+        return FaxTypeTranslation::getText($this->type) ?? (string) $this->type;
     }
 }

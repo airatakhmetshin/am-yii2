@@ -2,8 +2,8 @@
 
 namespace app\models;
 
-use app\enums\CustomerQualityEnum;
-use app\enums\CustomerTypeEnum;
+use app\translations\CustomerQualityTranslation;
+use app\translations\CustomerTypeTranslation;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -43,21 +43,13 @@ class Customer extends ActiveRecord
         ];
     }
 
-    /**
-     * @param $quality
-     * @return mixed|null
-     */
-    public static function getQualityTextByQuality($quality)
+    public static function getQualityTextByQuality(?string $quality): ?string
     {
-        return CustomerQualityEnum::getQualityTexts()[$quality] ?? $quality;
+        return CustomerQualityTranslation::getText($quality) ?? $quality;
     }
 
-    /**
-     * @param $type
-     * @return mixed
-     */
-    public static function getTypeTextByType($type)
+    public static function getTypeTextByType(?string $type): string
     {
-        return CustomerTypeEnum::getTypeTexts()[$type] ?? $type;
+        return CustomerTypeTranslation::getText($type) ?? $type;
     }
 }

@@ -2,8 +2,9 @@
 
 namespace app\models;
 
-use app\enums\TaskStateEnum;
 use app\enums\TaskStatusEnum;
+use app\translations\TaskStateTranslation;
+use app\translations\TaskStatusTranslation;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -66,16 +67,16 @@ class Task extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User'),
-            'customer_id' => Yii::t('app', 'Customer ID'),
-            'status' => Yii::t('app', 'Status'),
-            'title' => Yii::t('app', 'Title'),
-            'text' => Yii::t('app', 'Description'),
-            'due_date' => Yii::t('app', 'Due Date'),
+            'id'                 => Yii::t('app', 'ID'),
+            'user_id'            => Yii::t('app', 'User'),
+            'customer_id'        => Yii::t('app', 'Customer ID'),
+            'status'             => Yii::t('app', 'Status'),
+            'title'              => Yii::t('app', 'Title'),
+            'text'               => Yii::t('app', 'Description'),
+            'due_date'           => Yii::t('app', 'Due Date'),
             'formatted_due_date' => Yii::t('app', 'Due Date'),
-            'priority' => Yii::t('app', 'Priority'),
-            'ins_ts' => Yii::t('app', 'Ins Ts'),
+            'priority'           => Yii::t('app', 'Priority'),
+            'ins_ts'             => Yii::t('app', 'Ins Ts'),
         ];
     }
 
@@ -95,29 +96,19 @@ class Task extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    /**
-     * @param $value
-     * @return int|mixed
-     */
-    public function getStatusTextByValue($value)
+    public function getStatusTextByValue(string $value): string
     {
-        return TaskStatusEnum::getStatusTexts()[$value] ?? $value;
+        return TaskStatusTranslation::getText($value) ?? $value;
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getStatusText()
+    public function getStatusText(): string
     {
         return $this->getStatusTextByValue($this->status);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getStateText()
+    public function getStateText(): string
     {
-        return TaskStateEnum::getStateTexts()[$this->state] ?? $this->state;
+        return TaskStateTranslation::getText($this->state) ?? $this->state;
     }
 
     public function getIsOverdue(): bool

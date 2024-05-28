@@ -2,8 +2,8 @@
 
 namespace app\models;
 
-use app\enums\HistoryEventEnum;
 use app\models\traits\ObjectNameTrait;
+use app\translations\HistoryEventTranslation;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -65,15 +65,15 @@ class History extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'ins_ts' => Yii::t('app', 'Ins Ts'),
+            'id'          => Yii::t('app', 'ID'),
+            'ins_ts'      => Yii::t('app', 'Ins Ts'),
             'customer_id' => Yii::t('app', 'Customer ID'),
-            'event' => Yii::t('app', 'Event'),
-            'object' => Yii::t('app', 'Object'),
-            'object_id' => Yii::t('app', 'Object ID'),
-            'message' => Yii::t('app', 'Message'),
-            'detail' => Yii::t('app', 'Detail'),
-            'user_id' => Yii::t('app', 'User ID'),
+            'event'       => Yii::t('app', 'Event'),
+            'object'      => Yii::t('app', 'Object'),
+            'object_id'   => Yii::t('app', 'Object ID'),
+            'message'     => Yii::t('app', 'Message'),
+            'detail'      => Yii::t('app', 'Detail'),
+            'user_id'     => Yii::t('app', 'User ID'),
         ];
     }
 
@@ -93,19 +93,12 @@ class History extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    /**
-     * @param $event
-     * @return mixed
-     */
-    public static function getEventTextByEvent($event)
+    public static function getEventTextByEvent($event): string
     {
-        return HistoryEventEnum::getEventTexts()[$event] ?? $event;
+        return HistoryEventTranslation::getText($event) ?? $event;
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getEventText()
+    public function getEventText(): string
     {
         return static::getEventTextByEvent($this->event);
     }
@@ -117,6 +110,7 @@ class History extends ActiveRecord
     public function getDetailChangedAttribute($attribute)
     {
         $detail = json_decode($this->detail);
+
         return isset($detail->changedAttributes->{$attribute}) ? $detail->changedAttributes->{$attribute} : null;
     }
 
@@ -127,6 +121,7 @@ class History extends ActiveRecord
     public function getDetailOldValue($attribute)
     {
         $detail = $this->getDetailChangedAttribute($attribute);
+
         return isset($detail->old) ? $detail->old : null;
     }
 
@@ -137,6 +132,7 @@ class History extends ActiveRecord
     public function getDetailNewValue($attribute)
     {
         $detail = $this->getDetailChangedAttribute($attribute);
+
         return isset($detail->new) ? $detail->new : null;
     }
 
@@ -147,6 +143,7 @@ class History extends ActiveRecord
     public function getDetailData($attribute)
     {
         $detail = json_decode($this->detail);
+
         return isset($detail->data->{$attribute}) ? $detail->data->{$attribute} : null;
     }
 }

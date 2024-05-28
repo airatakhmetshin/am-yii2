@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\enums\UserStatusEnum;
+use app\translations\UserStatusTranslation;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -57,14 +58,14 @@ class User extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'username' => Yii::t('app', 'Username (login)'),
+            'id'         => Yii::t('app', 'ID'),
+            'username'   => Yii::t('app', 'Username (login)'),
             'statusText' => Yii::t('app', 'Status'),
         ];
     }
 
     public function getStatusText(): string
     {
-        return UserStatusEnum::getStatusTexts()[$this->status] ?? $this->status;
+        return UserStatusTranslation::getText($this->status) ?? (string) $this->status;
     }
 }
