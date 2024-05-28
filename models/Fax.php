@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use app\enums\FaxType;
+use app\enums\FaxTypeEnum;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -73,6 +73,6 @@ class Fax extends ActiveRecord
      */
     public function getTypeText()
     {
-        return FaxType::getTypeTexts()[$this->type] ?? $this->type;
+        return FaxTypeEnum::getTypeTexts()[$this->type] ?? $this->type;
     }
 }

@@ -6,7 +6,7 @@ namespace app\enums;
 
 use Yii;
 
-class FaxType
+class FaxTypeEnum
 {
     public const TYPE_POA_ATC = 'poa_atc';
     public const TYPE_REVOCATION_NOTICE = 'revocation_notice';
