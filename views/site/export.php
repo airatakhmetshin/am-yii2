@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * @deprecated use HistoryExportProcessor instead
+ *
  * @var $this yii\web\View
  * @var $model \app\models\History
  * @var $dataProvider yii\data\ActiveDataProvider

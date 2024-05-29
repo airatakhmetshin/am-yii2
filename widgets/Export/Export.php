@@ -5,6 +5,9 @@ namespace app\widgets\Export;
 use kartik\export\ExportMenu;
 use Yii;
 
+/**
+ * @deprecated use HistoryExportProcessor instead
+ */
 class Export extends ExportMenu
 {
     public $exportType = self::FORMAT_CSV;
