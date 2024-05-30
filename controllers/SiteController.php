@@ -55,19 +55,6 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * @deprecated use $this->actionExportDownload instead
-     */
-    public function actionExport(string $exportType): string
-    {
-        $dataProvider = $this->historySearch->search(Yii::$app->request->queryParams);
-
-        return $this->render('export', [
-            'dataProvider' => $dataProvider,
-            'exportType'   => $exportType,
-        ]);
-    }
-
     public function actionExportDownload(string $exportType)
     {
         $validator = new RangeValidator(['range' => [ExportTypeEnum::CSV]]);
