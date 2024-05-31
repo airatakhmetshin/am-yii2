@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\translations\FaxTypeTranslation;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -23,12 +24,6 @@ use yii\db\ActiveRecord;
  */
 class Fax extends ActiveRecord
 {
-    const DIRECTION_INCOMING = 0;
-    const DIRECTION_OUTGOING = 1;
-
-    const TYPE_POA_ATC = 'poa_atc';
-    const TYPE_REVOCATION_NOTICE = 'revocation_notice';
-
     /**
      * @inheritdoc
      */
@@ -57,11 +52,11 @@ class Fax extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'ins_ts' => Yii::t('app', 'Created Time'),
+            'id'      => Yii::t('app', 'ID'),
+            'ins_ts'  => Yii::t('app', 'Created Time'),
             'user_id' => Yii::t('app', 'User ID'),
-            'from' => Yii::t('app', 'From'),
-            'to' => Yii::t('app', 'To')
+            'from'    => Yii::t('app', 'From'),
+            'to'      => Yii::t('app', 'To'),
         ];
     }
 
@@ -73,23 +68,8 @@ class Fax extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    /**
-     * @return array
-     */
-    public static function getTypeTexts()
+    public function getTypeText(): string
     {
-        return [
-            self::TYPE_POA_ATC => Yii::t('app', 'POA/ATC'),
-            self::TYPE_REVOCATION_NOTICE => Yii::t('app', 'Revocation'),
-        ];
+        return FaxTypeTranslation::getText($this->type) ?? (string) $this->type;
     }
-
-    /**
-     * @return mixed|string
-     */
-    public function getTypeText()
-    {
-        return self::getTypeTexts()[$this->type] ?? $this->type;
-    }
-
 }

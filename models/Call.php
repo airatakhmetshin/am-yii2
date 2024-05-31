@@ -2,6 +2,9 @@
 
 namespace app\models;
 
+use app\enums\CallDirectionEnum;
+use app\enums\CallStatusEnum;
+use app\translations\CallDirectionTranslation;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -33,12 +36,6 @@ use yii\db\ActiveRecord;
  */
 class Call extends ActiveRecord
 {
-    const STATUS_NO_ANSWERED = 0;
-    const STATUS_ANSWERED = 1;
-
-    const DIRECTION_INCOMING = 0;
-    const DIRECTION_OUTGOING = 1;
-
     public $duration = 720;
 
     /**
@@ -70,16 +67,16 @@ class Call extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'ins_ts' => Yii::t('app', 'Date'),
-            'direction' => Yii::t('app', 'Direction'),
+            'id'            => Yii::t('app', 'ID'),
+            'ins_ts'        => Yii::t('app', 'Date'),
+            'direction'     => Yii::t('app', 'Direction'),
             'directionText' => Yii::t('app', 'Direction'),
-            'user_id' => Yii::t('app', 'User ID'),
-            'customer_id' => Yii::t('app', 'Customer ID'),
-            'status' => Yii::t('app', 'Status'),
-            'statusText' => Yii::t('app', 'Status'),
-            'phone_from' => Yii::t('app', 'Caller Phone'),
-            'phone_to' => Yii::t('app', 'Dialed Phone'),
+            'user_id'       => Yii::t('app', 'User ID'),
+            'customer_id'   => Yii::t('app', 'Customer ID'),
+            'status'        => Yii::t('app', 'Status'),
+            'statusText'    => Yii::t('app', 'Status'),
+            'phone_from'    => Yii::t('app', 'Caller Phone'),
+            'phone_to'      => Yii::t('app', 'Dialed Phone'),
             'user.fullname' => Yii::t('app', 'User'),
             'customer.name' => Yii::t('app', 'Client'),
         ];
@@ -101,12 +98,11 @@ class Call extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    /**
-     * @return string
-     */
-    public function getClient_phone()
+    public function getClient_phone(): string
     {
-        return $this->direction == self::DIRECTION_INCOMING ? $this->phone_from : $this->phone_to;
+        return $this->direction === CallDirectionEnum::DIRECTION_INCOMING
+            ? $this->phone_from
+            : $this->phone_to;
     }
 
     /**
@@ -115,15 +111,15 @@ class Call extends ActiveRecord
     public function getTotalStatusText()
     {
         if (
-            $this->status == self::STATUS_NO_ANSWERED
-            && $this->direction == self::DIRECTION_INCOMING
+            $this->status === CallStatusEnum::STATUS_NO_ANSWERED
+            && $this->direction === CallDirectionEnum::DIRECTION_INCOMING
         ) {
             return Yii::t('app', 'Missed Call');
         }
 
         if (
-            $this->status == self::STATUS_NO_ANSWERED
-            && $this->direction == self::DIRECTION_OUTGOING
+            $this->status === CallStatusEnum::STATUS_NO_ANSWERED
+            && $this->direction === CallDirectionEnum::DIRECTION_OUTGOING
         ) {
             return Yii::t('app', 'Client No Answer');
         }
@@ -137,46 +133,30 @@ class Call extends ActiveRecord
         return $msg;
     }
 
-    /**
-     * @param bool $hasComment
-     * @return string
-     */
-    public function getTotalDisposition($hasComment = true)
+    public function getTotalDisposition(bool $hasComment = true): string
     {
         $t = [];
+
         if ($hasComment && $this->comment) {
             $t[] = $this->comment;
         }
+
         return implode(': ', $t);
     }
 
-    /**
-     * @return array
-     */
-    public static function getFullDirectionTexts()
+    public function getFullDirectionText(): string
     {
-        return [
-            self::DIRECTION_INCOMING => Yii::t('app', 'Incoming Call'),
-            self::DIRECTION_OUTGOING => Yii::t('app', 'Outgoing Call'),
-        ];
+        return CallDirectionTranslation::getText($this->direction) ?? (string) $this->direction;
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getFullDirectionText()
-    {
-        return self::getFullDirectionTexts()[$this->direction] ?? $this->direction;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDurationText()
+    public function getDurationText(): string
     {
         if (!is_null($this->duration)) {
-            return $this->duration >= 3600 ? gmdate("H:i:s", $this->duration) : gmdate("i:s", $this->duration);
+            return $this->duration >= 3600
+                ? gmdate("H:i:s", $this->duration)
+                : gmdate("i:s", $this->duration);
         }
+
         return '00:00';
     }
 }

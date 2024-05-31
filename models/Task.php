@@ -2,6 +2,9 @@
 
 namespace app\models;
 
+use app\enums\TaskStatusEnum;
+use app\translations\TaskStateTranslation;
+use app\translations\TaskStatusTranslation;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -35,14 +38,6 @@ use yii\db\ActiveRecord;
  */
 class Task extends ActiveRecord
 {
-    const STATUS_NEW = 0;
-    const STATUS_DONE = 1;
-    const STATUS_CANCEL = 3;
-
-    const STATE_INBOX = 'inbox';
-    const STATE_DONE = 'done';
-    const STATE_FUTURE = 'future';
-
     /**
      * @inheritdoc
      */
@@ -72,16 +67,16 @@ class Task extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'user_id' => Yii::t('app', 'User'),
-            'customer_id' => Yii::t('app', 'Customer ID'),
-            'status' => Yii::t('app', 'Status'),
-            'title' => Yii::t('app', 'Title'),
-            'text' => Yii::t('app', 'Description'),
-            'due_date' => Yii::t('app', 'Due Date'),
+            'id'                 => Yii::t('app', 'ID'),
+            'user_id'            => Yii::t('app', 'User'),
+            'customer_id'        => Yii::t('app', 'Customer ID'),
+            'status'             => Yii::t('app', 'Status'),
+            'title'              => Yii::t('app', 'Title'),
+            'text'               => Yii::t('app', 'Description'),
+            'due_date'           => Yii::t('app', 'Due Date'),
             'formatted_due_date' => Yii::t('app', 'Due Date'),
-            'priority' => Yii::t('app', 'Priority'),
-            'ins_ts' => Yii::t('app', 'Ins Ts'),
+            'priority'           => Yii::t('app', 'Priority'),
+            'ins_ts'             => Yii::t('app', 'Ins Ts'),
         ];
     }
 
@@ -101,69 +96,28 @@ class Task extends ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    /**
-     * @return array
-     */
-    public static function getStatusTexts()
+    public function getStatusTextByValue(string $value): string
     {
-        return [
-            self::STATUS_NEW => Yii::t('app', 'New'),
-            self::STATUS_DONE => Yii::t('app', 'Complete'),
-            self::STATUS_CANCEL => Yii::t('app', 'Cancel'),
-        ];
+        return TaskStatusTranslation::getText($value) ?? $value;
     }
 
-    /**
-     * @param $value
-     * @return int|mixed
-     */
-    public function getStatusTextByValue($value)
+    public function getStatusText(): string
     {
-        return self::getStatusTexts()[$value] ?? $value;
+        return $this->getStatusTextByValue($this->status);
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getStatusText()
+    public function getStateText(): string
     {
-        return self::getStatusTextByValue($this->status);
+        return TaskStateTranslation::getText($this->state) ?? $this->state;
     }
 
-    /**
-     * @return array
-     */
-    public static function getStateTexts()
+    public function getIsOverdue(): bool
     {
-        return [
-            self::STATE_INBOX => Yii::t('app', 'Inbox'),
-            self::STATE_DONE => Yii::t('app', 'Done'),
-            self::STATE_FUTURE => Yii::t('app', 'Future')
-        ];
+        return $this->status !== TaskStatusEnum::STATUS_DONE && strtotime($this->due_date) < time();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getStateText()
+    public function getIsDone(): bool
     {
-        return self::getStateTexts()[$this->state] ?? $this->state;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function getIsOverdue()
-    {
-        return $this->status !== self::STATUS_DONE && strtotime($this->due_date) < time();
-    }
-
-    /**
-     * @return bool
-     */
-    public function getIsDone()
-    {
-        return $this->status == self::STATUS_DONE;
+        return $this->status === TaskStatusEnum::STATUS_DONE;
     }
 }
